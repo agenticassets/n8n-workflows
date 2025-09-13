@@ -1,263 +1,255 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+**Claude Code Guide for n8n Automation Tools**
 
-## Project Overview
+This repository combines two powerful n8n automation tools that work together seamlessly:
 
-This is a comprehensive collection of **2,053 n8n workflow automation files** with an advanced documentation and search system. The repository features both Python (FastAPI) and Node.js (Express) implementations for browsing, searching, and analyzing n8n workflows.
+1. **n8n MCP** (Model Context Protocol) - Live node discovery, configuration, and validation
+2. **FastAPI Workflow Browser** - Static analysis of 2,056 workflow files with advanced search
 
-## Development Commands
+## Tool Integration Strategy
 
-### Python-based System (Primary/Recommended)
+Use these tools in sequence for maximum effectiveness:
+
+**Discovery → Configuration → Validation**
+
+1. **FastAPI** - Find workflow examples and patterns
+2. **n8n MCP** - Configure and validate specific nodes
+3. **n8n MCP** - Deploy to live n8n instance
+
+## FastAPI Workflow Browser
+
+**Purpose**: Analyze and search through 2,056 static workflow files
+
+### Quick Start
 ```bash
-# Install Python dependencies
-pip install -r requirements.txt
-
-# Start the FastAPI documentation server (recommended)
+# Start the server (should already be running)
 python run.py
 
-# Development mode with auto-reload
-python run.py --dev
-
-# Custom host/port
-python run.py --host 0.0.0.0 --port 3000
-
-# Force database reindexing
-python run.py --reindex
-
-# Create workflow categorization data
-python create_categories.py
-
-# Import workflows into n8n instance
-python import_workflows.py
+# Access at: http://localhost:8000
 ```
 
-### Node.js-based System (Alternative)
+### Key Capabilities
+- **Search**: Full-text search across 29,522 workflow nodes
+- **Browse**: 16 categories (AI Agent Development, Communication, E-commerce, etc.)
+- **Analyze**: Trigger types, complexity levels, integration patterns
+- **Download**: Individual workflow JSON files
+
+### Essential API Usage
 ```bash
-# Install Node.js dependencies
-npm install
+# Search workflows by integration
+curl "http://localhost:8000/api/workflows?query=OpenAI&limit=5"
 
-# Initialize database
-npm run init
+# Browse by category
+curl "http://localhost:8000/api/workflows/category/AI Agent Development"
 
-# Index workflows
-npm run index
+# Get specific workflow details
+curl "http://localhost:8000/api/workflows/{filename}"
 
-# Start Node.js server
-npm start
-
-# Development mode with auto-reload
-npm run dev
+# Database statistics
+curl "http://localhost:8000/api/stats"
 ```
 
-### Database Operations
+## n8n MCP (Model Context Protocol)
+
+**Purpose**: Live n8n node discovery, configuration, and validation
+
+### Current Status
+- **535 total nodes** available (269 AI tools, 108 triggers)
+- **88% documentation coverage**
+- **Connected and operational**
+
+### Essential MCP Functions
+
+#### Discovery & Search
+```typescript
+// Find nodes by keyword
+mcp__n8n-mcp__search_nodes({query: "OpenAI", limit: 5})
+
+// List by category
+mcp__n8n-mcp__list_nodes({category: "AI", limit: 20})
+
+// List all AI-capable tools
+mcp__n8n-mcp__list_ai_tools()
+
+// Browse task templates
+mcp__n8n-mcp__list_tasks()
+```
+
+#### Configuration & Validation
+```typescript
+// Get node essentials (lightweight)
+mcp__n8n-mcp__get_node_essentials("nodes-base.openAi")
+
+// Get complete node schema (detailed)
+mcp__n8n-mcp__get_node_info("nodes-base.openAi")
+
+// Validate node configuration
+mcp__n8n-mcp__validate_node_operation("nodes-base.openAi", config)
+
+// Validate complete workflow
+mcp__n8n-mcp__validate_workflow(workflow)
+```
+
+#### Templates & Tasks
+```typescript
+// Get pre-configured node for task
+mcp__n8n-mcp__get_node_for_task("chat_with_ai")
+
+// Search workflow templates
+mcp__n8n-mcp__search_templates("AI chatbot")
+
+// Get complete template
+mcp__n8n-mcp__get_template(templateId)
+```
+
+## Integrated Workflow Patterns
+
+### 1. Discovery Phase (FastAPI)
+**Find existing solutions and patterns**
+
 ```bash
-# Direct database operations (Python)
-python workflow_db.py --index --force    # Force reindex all workflows
-python workflow_db.py --stats            # Show database statistics
+# Search for AI workflows
+curl "http://localhost:8000/api/workflows?query=OpenAI+ChatGPT&limit=10"
+
+# Browse specific categories
+curl "http://localhost:8000/api/workflows/category/AI Agent Development"
+
+# Analyze workflow complexity
+curl "http://localhost:8000/api/stats"
 ```
 
-## Repository Architecture
+**Use cases:**
+- Find similar workflow implementations
+- Understand integration patterns
+- Analyze complexity and node usage
+- Discover naming conventions
 
-### Core Structure
-- **`workflows/`** - 2,053 n8n workflow JSON files organized by service/integration (e.g., `Telegram/`, `Gmail/`, `Shopify/`)
-- **`context/`** - Category definitions and search data for workflow classification
-- **`database/`** - SQLite database with FTS5 full-text search (auto-created)
-- **`static/`** - Static web assets for the documentation interface
+### 2. Configuration Phase (n8n MCP)
+**Configure and understand specific nodes**
 
-### Dual Implementation Architecture
+```typescript
+// After finding OpenAI workflows, configure OpenAI node
+mcp__n8n-mcp__search_nodes({query: "OpenAI"})
+mcp__n8n-mcp__get_node_essentials("nodes-base.openAi")
 
-**Python System (Primary)**:
-- **`run.py`** - Main launcher with command-line interface
-- **`api_server.py`** - FastAPI server with RESTful API endpoints
-- **`workflow_db.py`** - Database operations using SQLite with FTS5 search
-- **`create_categories.py`** - Workflow categorization system
-- **`import_workflows.py`** - Bulk workflow import utility
+// Get task-specific configuration
+mcp__n8n-mcp__get_node_for_task("chat_with_ai")
 
-**Node.js System (Alternative)**:
-- **`src/server.js`** - Express.js server implementation
-- **`src/database.js`** - SQLite database operations
-- **`src/init-db.js`** - Database initialization
-- **`src/index-workflows.js`** - Workflow indexing
-
-### Workflow File Structure
-Each workflow JSON contains:
-- **name**: Human-readable workflow identifier
-- **nodes**: Array of n8n node definitions with types, parameters, and connections
-- **connections**: Graph structure defining data flow between nodes
-- **active**: Boolean indicating if workflow is enabled
-- **settings**: Workflow-level configuration options
-
-## Key Features & Systems
-
-### Advanced Search System
-- **SQLite FTS5**: Full-text search across 29,445 workflow nodes
-- **Sub-100ms responses**: Optimized database queries with proper indexing
-- **Smart categorization**: 365 unique integrations across 15 service categories
-- **Filter capabilities**: By trigger type (Webhook, Manual, Scheduled, Complex), complexity, and integration
-
-### Workflow Categories
-The system automatically categorizes workflows into these areas:
-- **AI Agent Development** - OpenAI, Anthropic, LangChain, vector stores
-- **Communication & Messaging** - Telegram, Discord, Slack, WhatsApp, email
-- **Data Processing & Analysis** - Databases, ETL, analytics platforms
-- **CRM & Sales** - Salesforce, HubSpot, Pipedrive
-- **E-commerce & Retail** - Shopify, Stripe, PayPal
-- **Marketing & Advertising** - Email marketing, campaign management
-- **Project Management** - Jira, Trello, Asana, Monday.com
-- **Social Media Management** - LinkedIn, Twitter, Facebook
-- **Creative Content** - Design automation, video processing
-- **Cloud Storage** - Google Drive, Dropbox, AWS S3
-- **Technical Infrastructure** - DevOps, monitoring, CI/CD
-- **Financial & Accounting** - QuickBooks, Xero, payment processing
-
-### Performance Optimizations
-- **Change detection**: MD5 hashing prevents unnecessary re-indexing
-- **Background processing**: Non-blocking workflow analysis
-- **Compressed responses**: Gzip middleware for optimal transfer speeds
-- **Mobile optimization**: Responsive design with touch-friendly interface
-
-## API Endpoints
-
-### Core Search & Browse
-- `GET /` - Main workflow browser interface
-- `GET /api/workflows` - Search with query, filters, and pagination
-- `GET /api/workflows/{filename}` - Individual workflow details
-- `GET /api/workflows/{filename}/download` - Download workflow JSON
-- `GET /api/stats` - Database statistics and metrics
-
-### Advanced Features
-- `GET /api/workflows/category/{category}` - Browse by service category
-- `GET /api/categories` - List all available categories
-- `GET /api/integrations` - Integration usage statistics
-- `POST /api/reindex` - Trigger background database reindexing
-
-## Workflow Naming Convention
-
-The repository uses an intelligent naming system that converts technical filenames to readable titles:
-
-**Pattern**: `[ID]_[Service1]_[Service2]_[Purpose]_[Trigger].json`
-
-**Examples**:
-- `2051_Telegram_Webhook_Automation_Webhook.json` → "Telegram Webhook Automation"
-- `0250_HTTP_Discord_Import_Scheduled.json` → "HTTP Discord Import Scheduled"
-- `0966_OpenAI_Data_Processing_Manual.json` → "OpenAI Data Processing Manual"
-
-## Database Schema
-
-### Workflows Table
-```sql
-CREATE TABLE workflows (
-    id INTEGER PRIMARY KEY,
-    filename TEXT UNIQUE,
-    name TEXT,
-    active BOOLEAN,
-    trigger_type TEXT,
-    complexity TEXT,
-    node_count INTEGER,
-    integrations TEXT,    -- JSON array of services used
-    description TEXT,
-    file_hash TEXT,       -- MD5 for change detection
-    analyzed_at TIMESTAMP
-);
-
--- Full-text search index
-CREATE VIRTUAL TABLE workflows_fts USING fts5(
-    filename, name, description, integrations, tags,
-    content='workflows', content_rowid='id'
-);
+// Understand dependencies
+mcp__n8n-mcp__get_property_dependencies("nodes-base.openAi")
 ```
 
-## Working with Workflows
+**Use cases:**
+- Understand node properties and requirements
+- Get pre-configured templates
+- Validate node configurations
+- Learn about property dependencies
 
-### Security Considerations
-- **Remove credentials**: All workflow files should have credentials/API keys removed
-- **Webhook URLs**: Replace personal webhook URLs with placeholders
-- **Test environment**: Always verify workflows in development before production use
-- **Permissions**: Ensure proper access rights for all external integrations
+### 3. Validation Phase (n8n MCP)
+**Validate before deployment**
 
-### Import Process
-1. Export workflow as JSON from n8n interface
-2. Follow naming convention: `[ID]_[Service]_[Purpose]_[Trigger].json`
-3. Remove sensitive data (credentials, personal URLs, API keys)
-4. Place in appropriate service directory under `workflows/`
-5. Run reindexing to update search database
+```typescript
+// Validate individual nodes
+mcp__n8n-mcp__validate_node_operation("nodes-base.openAi", config)
 
-### Integration Categories
-When adding new workflows, ensure services are mapped in `context/def_categories.json` for proper categorization. The system will automatically detect services from filenames and assign appropriate categories.
+// Validate complete workflow
+mcp__n8n-mcp__validate_workflow(workflowJson)
 
-## Common Tasks
+// Check connections and structure
+mcp__n8n-mcp__validate_workflow_connections(workflow)
+```
 
-### Adding New Workflow Categories
-1. Edit `context/def_categories.json` to add service-to-category mappings
-2. Run `python create_categories.py` to regenerate search categories
-3. Restart the server to load new categorization data
+**Use cases:**
+- Ensure configuration correctness
+- Validate workflow structure
+- Check for missing properties
+- Verify connections and flow
 
-### Debugging Search Issues
-1. Check database stats: `python workflow_db.py --stats`
-2. Force reindex if needed: `python run.py --reindex`
-3. Verify workflow JSON format is valid
-4. Check integration detection in filename parsing
+## Quick Reference
 
-### Performance Monitoring
-- Monitor response times via `/api/stats` endpoint
-- Database size should remain under 100MB for optimal performance
-- FTS5 search handles up to 50k+ workflows efficiently
-
-## Docker Deployment
-
-### Quick Start with Docker
+### FastAPI Endpoints (Static Analysis)
 ```bash
-# Build and run with docker-compose (recommended)
-docker-compose up -d
-
-# Access the application at http://localhost:8000
-# Database will be persisted in ./database/ directory
+GET /api/workflows              # Search workflows
+GET /api/workflows/{filename}   # Get workflow details
+GET /api/categories             # List categories
+GET /api/stats                  # Database statistics
 ```
 
-### Docker Commands
+### n8n MCP Functions (Live Data)
+```typescript
+// Essential discovery functions
+search_nodes({query, limit})           // Find nodes by keyword
+list_nodes({category, limit})          // List nodes by category
+list_ai_tools()                        // All AI-capable nodes
+
+// Essential configuration functions
+get_node_essentials(nodeType)          // Key properties only
+validate_node_operation(nodeType, config) // Validate configuration
+
+// Essential template functions
+list_tasks()                           // Browse task templates
+get_node_for_task(task)               // Pre-configured nodes
+```
+
+### Performance Tips
+- **FastAPI**: Use specific queries and filters for faster results
+- **n8n MCP**: Use `get_node_essentials` instead of `get_node_info` for speed
+- **Integration**: Always validate with MCP after finding patterns in FastAPI
+
+## Common Usage Examples
+
+### Example 1: Building an AI Chatbot
 ```bash
-# Build and start the container
-docker-compose up -d
+# 1. Discovery - Find AI chatbot examples
+curl "http://localhost:8000/api/workflows?query=chatbot+OpenAI&limit=5"
 
-# View logs
-docker-compose logs -f n8n-workflows
+# 2. Configuration - Understand OpenAI node
+mcp__n8n-mcp__get_node_for_task("chat_with_ai")
+mcp__n8n-mcp__get_node_essentials("nodes-base.openAi")
 
-# Stop the container
-docker-compose down
-
-# Rebuild after code changes
-docker-compose up -d --build
-
-# Use pre-built image (no build step)
-docker-compose --profile prebuilt up -d n8n-workflows-prebuilt
-
-# Force database reindexing in container
-docker-compose exec n8n-workflows python run.py --reindex
+# 3. Validation - Check configuration
+mcp__n8n-mcp__validate_node_operation("nodes-base.openAi", yourConfig)
 ```
 
-### Docker Architecture
-- **Base image**: `python:3.11-slim` for optimal size and security
-- **Security**: Runs as non-root user (`appuser`)
-- **Persistence**: Database volume mounted at `./database/`
-- **Health checks**: Built-in health monitoring via `/api/stats` endpoint
-- **Auto-restart**: Container restarts automatically unless manually stopped
+### Example 2: Webhook Integration
+```bash
+# 1. Discovery - Find webhook patterns
+curl "http://localhost:8000/api/workflows?query=webhook&trigger=Webhook&limit=10"
 
-### Volume Mounts
-- `./database:/app/database` - Persists SQLite database between restarts
-- `./workflows:/app/workflows:ro` - Read-only access to workflow files
-- `./context:/app/context:ro` - Read-only access to category definitions
+# 2. Configuration - Setup webhook node
+mcp__n8n-mcp__get_node_for_task("receive_webhook")
+mcp__n8n-mcp__get_property_dependencies("nodes-base.webhook")
 
-### Environment Variables
-- `PYTHONUNBUFFERED=1` - Ensures real-time log output
-- `WORKFLOW_DB_PATH=/app/database/workflows.db` - Database location
+# 3. Validation - Verify webhook setup
+mcp__n8n-mcp__validate_workflow_connections(workflowJson)
+```
 
-## Development Notes
+### Example 3: Database Operations
+```bash
+# 1. Discovery - Find database workflows
+curl "http://localhost:8000/api/workflows/category/Data Processing & Analysis"
 
-- **Preferred system**: Use Python-based system (`run.py`) for primary development
-- **Database**: SQLite with FTS5 provides excellent performance for this use case
-- **Search optimization**: Index updates are incremental based on file modification times
-- **Mobile support**: Interface is fully responsive and touch-optimized
-- **Error handling**: Graceful degradation when workflows have parsing issues
-- **Version compatibility**: Designed for n8n 1.0+ but includes backward compatibility
-- **Docker support**: Fully containerized with persistence and health monitoring
+# 2. Configuration - Setup database node
+mcp__n8n-mcp__get_node_for_task("query_postgres")
+mcp__n8n-mcp__list_nodes({category: "database"})
+
+# 3. Validation - Check database config
+mcp__n8n-mcp__validate_node_minimal("nodes-base.postgres", config)
+```
+
+## Key Statistics
+
+### FastAPI Database
+- **2,056 workflows** analyzed
+- **29,522 nodes** indexed
+- **365 unique integrations**
+- **16 categories** available
+
+### n8n MCP
+- **535 nodes** available
+- **269 AI tools** ready
+- **108 trigger nodes**
+- **88% documentation** coverage
+
+Use both tools together for comprehensive n8n workflow development and analysis.
