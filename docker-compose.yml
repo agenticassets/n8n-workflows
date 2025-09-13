@@ -1,7 +1,52 @@
+version: '3.8'
+
 services:
-  doc:
-    image: workflows-doc:latest
-    build:
-      context: .
+  n8n-workflows:
+    build: .
+    container_name: n8n-workflows-docs
     ports:
       - "8000:8000"
+    volumes:
+      # Persist database between container restarts
+      - ./database:/app/database
+      # Mount workflows directory for easy updates
+      - ./workflows:/app/workflows:ro
+      # Mount context for category definitions
+      - ./context:/app/context:ro
+    environment:
+      - PYTHONUNBUFFERED=1
+      - WORKFLOW_DB_PATH=/app/database/workflows.db
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/stats"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Alternative: Use pre-built Python image if you don't want to build
+  n8n-workflows-prebuilt:
+    image: python:3.11-slim
+    container_name: n8n-workflows-prebuilt
+    profiles:
+      - prebuilt
+    working_dir: /app
+    command: >
+      sh -c "
+        apt-get update &&
+        apt-get install -y curl sqlite3 &&
+        pip install -r requirements.txt &&
+        python run.py --host 0.0.0.0 --port 8000
+      "
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/app
+    environment:
+      - PYTHONUNBUFFERED=1
+      - WORKFLOW_DB_PATH=/app/database/workflows.db
+    restart: unless-stopped
+
+networks:
+  default:
+    name: n8n-workflows-net

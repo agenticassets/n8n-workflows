@@ -1,112 +1,263 @@
-# n8n-workflows Repository
+# CLAUDE.md
 
-## Overview
-This repository contains a collection of n8n workflow automation files. n8n is a workflow automation tool that allows creating complex automations through a visual node-based interface. Each workflow is stored as a JSON file containing node definitions, connections, and configurations.
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-## Repository Structure
+## Project Overview
+
+This is a comprehensive collection of **2,053 n8n workflow automation files** with an advanced documentation and search system. The repository features both Python (FastAPI) and Node.js (Express) implementations for browsing, searching, and analyzing n8n workflows.
+
+## Development Commands
+
+### Python-based System (Primary/Recommended)
+```bash
+# Install Python dependencies
+pip install -r requirements.txt
+
+# Start the FastAPI documentation server (recommended)
+python run.py
+
+# Development mode with auto-reload
+python run.py --dev
+
+# Custom host/port
+python run.py --host 0.0.0.0 --port 3000
+
+# Force database reindexing
+python run.py --reindex
+
+# Create workflow categorization data
+python create_categories.py
+
+# Import workflows into n8n instance
+python import_workflows.py
 ```
-n8n-workflows/
-├── workflows/           # Main directory containing all n8n workflow JSON files
-│   ├── *.json          # Individual workflow files
-├── README.md           # Repository documentation
-├── claude.md           # This file - AI assistant context
-└── [other files]       # Additional configuration or documentation files
+
+### Node.js-based System (Alternative)
+```bash
+# Install Node.js dependencies
+npm install
+
+# Initialize database
+npm run init
+
+# Index workflows
+npm run index
+
+# Start Node.js server
+npm start
+
+# Development mode with auto-reload
+npm run dev
 ```
 
-## Workflow File Format
-Each workflow JSON file contains:
-- **name**: Workflow identifier
-- **nodes**: Array of node objects defining operations
-- **connections**: Object defining how nodes are connected
-- **settings**: Workflow-level configuration
-- **staticData**: Persistent data across executions
-- **tags**: Categorization tags
-- **createdAt/updatedAt**: Timestamps
+### Database Operations
+```bash
+# Direct database operations (Python)
+python workflow_db.py --index --force    # Force reindex all workflows
+python workflow_db.py --stats            # Show database statistics
+```
 
-## Common Node Types
-- **Trigger Nodes**: webhook, cron, manual
-- **Integration Nodes**: HTTP Request, database connectors, API integrations
-- **Logic Nodes**: IF, Switch, Merge, Loop
-- **Data Nodes**: Function, Set, Transform Data
-- **Communication**: Email, Slack, Discord, etc.
+## Repository Architecture
 
-## Working with This Repository
+### Core Structure
+- **`workflows/`** - 2,053 n8n workflow JSON files organized by service/integration (e.g., `Telegram/`, `Gmail/`, `Shopify/`)
+- **`context/`** - Category definitions and search data for workflow classification
+- **`database/`** - SQLite database with FTS5 full-text search (auto-created)
+- **`static/`** - Static web assets for the documentation interface
 
-### For Analysis Tasks
-When analyzing workflows in this repository:
-1. Parse JSON files to understand workflow structure
-2. Examine node chains to determine functionality
-3. Identify external integrations and dependencies
-4. Consider the business logic implemented by node connections
+### Dual Implementation Architecture
 
-### For Documentation Tasks
-When documenting workflows:
-1. Verify existing descriptions against actual implementation
-2. Identify trigger mechanisms and schedules
-3. List all external services and APIs used
-4. Note data transformations and business logic
-5. Highlight any error handling or retry mechanisms
+**Python System (Primary)**:
+- **`run.py`** - Main launcher with command-line interface
+- **`api_server.py`** - FastAPI server with RESTful API endpoints
+- **`workflow_db.py`** - Database operations using SQLite with FTS5 search
+- **`create_categories.py`** - Workflow categorization system
+- **`import_workflows.py`** - Bulk workflow import utility
 
-### For Modification Tasks
-When modifying workflows:
-1. Preserve the JSON structure and required fields
-2. Maintain node ID uniqueness
-3. Update connections when adding/removing nodes
-4. Test compatibility with n8n version requirements
+**Node.js System (Alternative)**:
+- **`src/server.js`** - Express.js server implementation
+- **`src/database.js`** - SQLite database operations
+- **`src/init-db.js`** - Database initialization
+- **`src/index-workflows.js`** - Workflow indexing
 
-## Key Considerations
+### Workflow File Structure
+Each workflow JSON contains:
+- **name**: Human-readable workflow identifier
+- **nodes**: Array of n8n node definitions with types, parameters, and connections
+- **connections**: Graph structure defining data flow between nodes
+- **active**: Boolean indicating if workflow is enabled
+- **settings**: Workflow-level configuration options
 
-### Security
-- Workflow files may contain sensitive information in webhook URLs or API configurations
-- Credentials are typically stored separately in n8n, not in the workflow files
-- Be cautious with any hardcoded values or endpoints
+## Key Features & Systems
 
-### Best Practices
-- Workflows should have clear, descriptive names
-- Complex workflows benefit from documentation nodes or comments
-- Error handling nodes improve reliability
-- Modular workflows (calling sub-workflows) improve maintainability
+### Advanced Search System
+- **SQLite FTS5**: Full-text search across 29,445 workflow nodes
+- **Sub-100ms responses**: Optimized database queries with proper indexing
+- **Smart categorization**: 365 unique integrations across 15 service categories
+- **Filter capabilities**: By trigger type (Webhook, Manual, Scheduled, Complex), complexity, and integration
 
-### Common Patterns
-- **Data Pipeline**: Trigger → Fetch Data → Transform → Store/Send
-- **Integration Sync**: Cron → API Call → Compare → Update Systems
-- **Automation**: Webhook → Process → Conditional Logic → Actions
-- **Monitoring**: Schedule → Check Status → Alert if Issues
+### Workflow Categories
+The system automatically categorizes workflows into these areas:
+- **AI Agent Development** - OpenAI, Anthropic, LangChain, vector stores
+- **Communication & Messaging** - Telegram, Discord, Slack, WhatsApp, email
+- **Data Processing & Analysis** - Databases, ETL, analytics platforms
+- **CRM & Sales** - Salesforce, HubSpot, Pipedrive
+- **E-commerce & Retail** - Shopify, Stripe, PayPal
+- **Marketing & Advertising** - Email marketing, campaign management
+- **Project Management** - Jira, Trello, Asana, Monday.com
+- **Social Media Management** - LinkedIn, Twitter, Facebook
+- **Creative Content** - Design automation, video processing
+- **Cloud Storage** - Google Drive, Dropbox, AWS S3
+- **Technical Infrastructure** - DevOps, monitoring, CI/CD
+- **Financial & Accounting** - QuickBooks, Xero, payment processing
 
-## Helpful Context for AI Assistants
+### Performance Optimizations
+- **Change detection**: MD5 hashing prevents unnecessary re-indexing
+- **Background processing**: Non-blocking workflow analysis
+- **Compressed responses**: Gzip middleware for optimal transfer speeds
+- **Mobile optimization**: Responsive design with touch-friendly interface
 
-When assisting with this repository:
+## API Endpoints
 
-1. **Workflow Analysis**: Focus on understanding the business purpose by examining the node flow, not just individual nodes.
+### Core Search & Browse
+- `GET /` - Main workflow browser interface
+- `GET /api/workflows` - Search with query, filters, and pagination
+- `GET /api/workflows/{filename}` - Individual workflow details
+- `GET /api/workflows/{filename}/download` - Download workflow JSON
+- `GET /api/stats` - Database statistics and metrics
 
-2. **Documentation Generation**: Create descriptions that explain what the workflow accomplishes, not just what nodes it contains.
+### Advanced Features
+- `GET /api/workflows/category/{category}` - Browse by service category
+- `GET /api/categories` - List all available categories
+- `GET /api/integrations` - Integration usage statistics
+- `POST /api/reindex` - Trigger background database reindexing
 
-3. **Troubleshooting**: Common issues include:
-   - Incorrect node connections
-   - Missing error handling
-   - Inefficient data processing in loops
-   - Hardcoded values that should be parameters
+## Workflow Naming Convention
 
-4. **Optimization Suggestions**:
-   - Identify redundant operations
-   - Suggest batch processing where applicable
-   - Recommend error handling additions
-   - Propose splitting complex workflows
+The repository uses an intelligent naming system that converts technical filenames to readable titles:
 
-5. **Code Generation**: When creating tools to analyze these workflows:
-   - Handle various n8n format versions
-   - Account for custom nodes
-   - Parse expressions in node parameters
-   - Consider node execution order
+**Pattern**: `[ID]_[Service1]_[Service2]_[Purpose]_[Trigger].json`
 
-## Repository-Specific Information
-[Add any specific information about your workflows, naming conventions, or special considerations here]
+**Examples**:
+- `2051_Telegram_Webhook_Automation_Webhook.json` → "Telegram Webhook Automation"
+- `0250_HTTP_Discord_Import_Scheduled.json` → "HTTP Discord Import Scheduled"
+- `0966_OpenAI_Data_Processing_Manual.json` → "OpenAI Data Processing Manual"
 
-## Version Compatibility
-- n8n version: [Specify the n8n version these workflows are compatible with]
-- Last updated: [Date of last major update]
-- Migration notes: [Any version-specific considerations]
+## Database Schema
 
----
+### Workflows Table
+```sql
+CREATE TABLE workflows (
+    id INTEGER PRIMARY KEY,
+    filename TEXT UNIQUE,
+    name TEXT,
+    active BOOLEAN,
+    trigger_type TEXT,
+    complexity TEXT,
+    node_count INTEGER,
+    integrations TEXT,    -- JSON array of services used
+    description TEXT,
+    file_hash TEXT,       -- MD5 for change detection
+    analyzed_at TIMESTAMP
+);
 
-[中文](./CLAUDE_ZH.md)
+-- Full-text search index
+CREATE VIRTUAL TABLE workflows_fts USING fts5(
+    filename, name, description, integrations, tags,
+    content='workflows', content_rowid='id'
+);
+```
+
+## Working with Workflows
+
+### Security Considerations
+- **Remove credentials**: All workflow files should have credentials/API keys removed
+- **Webhook URLs**: Replace personal webhook URLs with placeholders
+- **Test environment**: Always verify workflows in development before production use
+- **Permissions**: Ensure proper access rights for all external integrations
+
+### Import Process
+1. Export workflow as JSON from n8n interface
+2. Follow naming convention: `[ID]_[Service]_[Purpose]_[Trigger].json`
+3. Remove sensitive data (credentials, personal URLs, API keys)
+4. Place in appropriate service directory under `workflows/`
+5. Run reindexing to update search database
+
+### Integration Categories
+When adding new workflows, ensure services are mapped in `context/def_categories.json` for proper categorization. The system will automatically detect services from filenames and assign appropriate categories.
+
+## Common Tasks
+
+### Adding New Workflow Categories
+1. Edit `context/def_categories.json` to add service-to-category mappings
+2. Run `python create_categories.py` to regenerate search categories
+3. Restart the server to load new categorization data
+
+### Debugging Search Issues
+1. Check database stats: `python workflow_db.py --stats`
+2. Force reindex if needed: `python run.py --reindex`
+3. Verify workflow JSON format is valid
+4. Check integration detection in filename parsing
+
+### Performance Monitoring
+- Monitor response times via `/api/stats` endpoint
+- Database size should remain under 100MB for optimal performance
+- FTS5 search handles up to 50k+ workflows efficiently
+
+## Docker Deployment
+
+### Quick Start with Docker
+```bash
+# Build and run with docker-compose (recommended)
+docker-compose up -d
+
+# Access the application at http://localhost:8000
+# Database will be persisted in ./database/ directory
+```
+
+### Docker Commands
+```bash
+# Build and start the container
+docker-compose up -d
+
+# View logs
+docker-compose logs -f n8n-workflows
+
+# Stop the container
+docker-compose down
+
+# Rebuild after code changes
+docker-compose up -d --build
+
+# Use pre-built image (no build step)
+docker-compose --profile prebuilt up -d n8n-workflows-prebuilt
+
+# Force database reindexing in container
+docker-compose exec n8n-workflows python run.py --reindex
+```
+
+### Docker Architecture
+- **Base image**: `python:3.11-slim` for optimal size and security
+- **Security**: Runs as non-root user (`appuser`)
+- **Persistence**: Database volume mounted at `./database/`
+- **Health checks**: Built-in health monitoring via `/api/stats` endpoint
+- **Auto-restart**: Container restarts automatically unless manually stopped
+
+### Volume Mounts
+- `./database:/app/database` - Persists SQLite database between restarts
+- `./workflows:/app/workflows:ro` - Read-only access to workflow files
+- `./context:/app/context:ro` - Read-only access to category definitions
+
+### Environment Variables
+- `PYTHONUNBUFFERED=1` - Ensures real-time log output
+- `WORKFLOW_DB_PATH=/app/database/workflows.db` - Database location
+
+## Development Notes
+
+- **Preferred system**: Use Python-based system (`run.py`) for primary development
+- **Database**: SQLite with FTS5 provides excellent performance for this use case
+- **Search optimization**: Index updates are incremental based on file modification times
+- **Mobile support**: Interface is fully responsive and touch-optimized
+- **Error handling**: Graceful degradation when workflows have parsing issues
+- **Version compatibility**: Designed for n8n 1.0+ but includes backward compatibility
+- **Docker support**: Fully containerized with persistence and health monitoring
