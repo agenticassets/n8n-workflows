@@ -1,17 +1,40 @@
 ---
-description: Testing and validation patterns for workflow system reliability
-globs: tests/**,*.py,*.test.*,*.spec.*
+description: Workflow testing strategies and validation techniques for reliable automation
+globs: workflows/*.json,run.py
 alwaysApply: false
 ---
 
-- Implement API endpoint tests for all FastAPI routes with proper status code validation
-- Create database operation tests for indexing, search, and FTS5 functionality
-- Test workflow JSON parsing and node analysis for data integrity
-- Validate categorization accuracy with known service-to-category mappings
-- Implement smoke tests for critical paths: database connection, API responses, search functionality
-- Test error handling for malformed workflows, missing files, and database failures
-- Validate naming convention transformations with comprehensive test cases
-- Test performance benchmarks: sub-100ms search, efficient indexing, memory usage
-- Use sample datasets for testing to avoid full workflow processing in CI/CD
+## Workflow Testing Methodologies
 
+### Node Validation
+- **Trigger Testing**: Verify webhook endpoints, schedule timing, manual trigger accessibility
+- **Action Node Testing**: Test service integrations (Google Sheets, OpenAI, Telegram) with mock data
+- **Flow Control Testing**: Validate Split In Batches, Switch conditions, Merge logic
+- **Error Path Testing**: Test API timeouts, authentication errors, data format issues
+
+### Integration Testing
+- **API Validation**: Test external API calls with authentication, rate limiting, error handling
+- **Data Flow Testing**: Verify transformations between nodes using Code/JavaScript validation
+- **Cross-Service Testing**: Test workflows combining Google Workspace + Communication tools
+- **Authentication Testing**: Validate credential handling and token refresh
+
+### Performance Testing
+- **Load Testing**: Test high volume workflows using Split In Batches with large datasets
+- **Timing Testing**: Measure execution times and optimize slow components
+- **Memory Testing**: Monitor usage in data processing or file operation workflows
+- **Concurrent Testing**: Test multiple simultaneous workflow instances
+
+### Multi-Agent Testing
+- **Agent Isolation**: Test individual agents before orchestration
+- **Communication Testing**: Validate data passing via shared variables and webhooks
+- **Orchestration Testing**: Test complete multi-agent workflows with various scenarios
+- **Failure Recovery**: Test agent failure scenarios and fallback mechanisms
+
+### Validation Best Practices
+- **Input Validation**: Use Code nodes to validate incoming data
+- **Output Validation**: Verify outputs match expected formats and contain required data
+- **Edge Case Testing**: Test with empty datasets, malformed data, boundary conditions
+- **Regression Testing**: Maintain test suites for critical workflows
+
+@Documentation/troubleshooting.md
 @run.py

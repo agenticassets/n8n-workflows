@@ -1,18 +1,40 @@
 ---
-description: Workflow categorization, naming conventions, and organization patterns
-globs: create_categories.py,context/**,workflows/**
+description: Multi-agent workflow design patterns and orchestration strategies
+globs: real-estate-ai-literature-review/*.json,workflows/*.json
 alwaysApply: false
 ---
 
-- Follow naming convention: [ID]_[Service1]_[Service2]_[Purpose]_[Trigger].json
-- Use intelligent capitalization: HTTP→HTTP, API→API, webhook→Webhook, automation→Automation
-- Implement automatic service detection from filename tokens and node analysis
-- Map integrations to 16 business categories using context/def_categories.json
-- Store category assignments in context/search_categories.json for search filtering
-- Use regex normalization to handle integration name variations and special characters
-- Support partial matching for common service name variations
-- Validate categorization accuracy with manual review and automated testing
-- Maintain unique_categories.json as authoritative category reference
+## Multi-Agent Architecture Patterns
 
-@create_categories.py
-@context/def_categories.json
+### Orchestrator-Worker Pattern
+- **Master Orchestrator**: ExecuteWorkflow node coordinates specialized agent workflows
+- **Specialized Agents**: Focused workflows for email, calendar, data processing tasks
+- **Communication Layer**: Shared data stores or webhooks for agent coordination
+- **Example**: AI orchestrating research, writing, publishing workflows
+
+### Chain of Thought Workflows
+- **Sequential Processing**: OpenAI nodes with memory buffers for complex reasoning
+- **Iterative Refinement**: Loops for self-improvement cycles
+- **Context Preservation**: Conversation history across agent interactions
+- **Example**: Content creation: research → outline → draft → edit → publish
+
+### Parallel Processing
+- **Concurrent Execution**: Split In Batches for simultaneous agent execution
+- **Result Aggregation**: Merge nodes consolidate parallel outputs
+- **Load Balancing**: Distribute tasks across workflow instances
+- **Example**: Bulk outreach with parallel email agents
+
+### Agent Integration
+- **Tool Nodes**: Specialized nodes like Googlecalendartool, Gmailtool
+- **Function Calling**: OpenAI function calling for real-world actions
+- **API Orchestration**: Multiple API calls with HTTP Request nodes
+- **Example**: Personal assistant coordinating calendar, email, tasks
+
+### Communication Patterns
+- **Shared Memory**: Workflow variables and memory buffers
+- **Webhook Chains**: Event-driven processing between agents
+- **Database Coordination**: Shared databases for agent states
+- **Message Queues**: Redis queuing for reliable communication
+
+@real-estate-ai-literature-review/Multi-agent-workflow-orchestrator.json
+@real-estate-ai-literature-review/AI-Agent.json

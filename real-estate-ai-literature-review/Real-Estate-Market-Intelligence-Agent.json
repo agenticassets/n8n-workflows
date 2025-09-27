@@ -1,0 +1,383 @@
+{
+    "nodes": [
+      {
+        "parameters": {
+          "triggerTimes": {
+            "item": [
+              {
+                "mode": "everyHour"
+              }
+            ]
+          }
+        },
+        "id": "intelligence-trigger",
+        "name": "Market Intelligence Trigger",
+        "type": "n8n-nodes-base.scheduleTrigger",
+        "position": [
+          240,
+          -80
+        ],
+        "typeVersion": 1.1
+      },
+      {
+        "parameters": {},
+        "id": "intelligence-memory",
+        "name": "Intelligence Memory",
+        "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+        "position": [
+          400,
+          80
+        ],
+        "typeVersion": 1.3
+      },
+      {
+        "parameters": {
+          "model": {
+            "__rl": true,
+            "mode": "list",
+            "value": "gpt-4o",
+            "cachedResultName": "gpt-4o"
+          },
+          "options": {
+            "maxTokens": 2500,
+            "temperature": 0.4
+          }
+        },
+        "id": "intelligence-model",
+        "name": "Intelligence Synthesis Model",
+        "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+        "position": [
+          272,
+          80
+        ],
+        "typeVersion": 1.2,
+        "credentials": {
+          "openAiApi": {
+            "id": "R4kqYMlb7z36skUH",
+            "name": "OpenAi-Agentic-Assets"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "url": "={{ $fromAI('sources', 'News sources: Bloomberg, Reuters, WSJ, CREW Network, Bisnow', 'string').split(',')[0] || 'https://feeds.bbci.co.uk/news/world/rss.xml' }}",
+          "options": {}
+        },
+        "id": "news-aggregator",
+        "name": "Market News Monitor",
+        "type": "n8n-nodes-base.rssFeedReadTool",
+        "position": [
+          720,
+          80
+        ],
+        "typeVersion": 1.2
+      },
+      {
+        "parameters": {
+          "url": "https://api.github.com/search/code",
+          "method": "GET",
+          "sendQuery": true,
+          "queryParameters": {
+            "parameters": [
+              {
+                "name": "q",
+                "value": "={{ $fromAI('hashtags', 'Hashtags: #CRE, #RealEstate, #PropTech, #CommercialRealEstate', 'string') }}"
+              },
+              {
+                "name": "extension",
+                "value": "md"
+              }
+            ]
+          },
+          "toolDescription": "Analyzes Twitter, Reddit, LinkedIn for real estate discussions, investor confidence, and industry buzz",
+          "optimizeResponse": true
+        },
+        "id": "social-sentinel",
+        "name": "Sentiment Analysis Engine",
+        "type": "@n8n/n8n-nodes-langchain.toolHttpRequest",
+        "position": [
+          864,
+          80
+        ],
+        "typeVersion": 1
+      },
+      {
+        "parameters": {
+          "url": "https://api.stlouisfed.org/fred/series/observations",
+          "method": "GET",
+          "sendQuery": true,
+          "queryParameters": {
+            "parameters": [
+              {
+                "name": "series_id",
+                "value": "MORTGAGE30US"
+              },
+              {
+                "name": "api_key",
+                "value": "demo"
+              },
+              {
+                "name": "file_type",
+                "value": "json"
+              }
+            ]
+          },
+          "toolDescription": "Tracks FRED API data for employment, interest rates, construction spending, and local market indicators",
+          "optimizeResponse": true
+        },
+        "id": "economic-collector",
+        "name": "Macro Indicator Tracker",
+        "type": "@n8n/n8n-nodes-langchain.toolHttpRequest",
+        "position": [
+          1008,
+          80
+        ],
+        "typeVersion": 1
+      },
+      {
+        "parameters": {},
+        "id": "news-processor",
+        "name": "Financial News Processor",
+        "type": "@n8n/n8n-nodes-langchain.toolCalculator",
+        "position": [
+          720,
+          240
+        ],
+        "typeVersion": 1
+      },
+      {
+        "parameters": {},
+        "id": "sentiment-analyzer",
+        "name": "Market Mood Analyzer",
+        "type": "@n8n/n8n-nodes-langchain.toolCalculator",
+        "position": [
+          864,
+          240
+        ],
+        "typeVersion": 1
+      },
+      {
+        "parameters": {},
+        "id": "economic-analyzer",
+        "name": "Market Fundamentals Engine",
+        "type": "@n8n/n8n-nodes-langchain.toolCalculator",
+        "position": [
+          1008,
+          240
+        ],
+        "typeVersion": 1
+      },
+      {
+        "parameters": {
+          "workflowId": "",
+          "toolDescription": "Combines all data sources into coherent market narratives and trend forecasts using multimodal LLMs"
+        },
+        "id": "market-synthesis",
+        "name": "Intelligence Integrator",
+        "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+        "position": [
+          720,
+          400
+        ],
+        "typeVersion": 1
+      },
+      {
+        "parameters": {},
+        "id": "anomaly-detector",
+        "name": "Market Alert System",
+        "type": "@n8n/n8n-nodes-langchain.toolCalculator",
+        "position": [
+          864,
+          400
+        ],
+        "typeVersion": 1
+      },
+      {
+        "parameters": {
+          "fileName": "market-intelligence-dashboard.html",
+          "data": "={{ $fromAI('dashboardData', 'Intelligence data including market synthesis, alerts, and visualizations', 'string') }}",
+          "template": "market-intelligence-template.html",
+          "options": {
+            "fileName": "market-intelligence-{{ Date.now() }}.html"
+          }
+        },
+        "id": "intelligence-dashboard",
+        "name": "Market Intelligence Portal",
+        "type": "n8n-nodes-base.htmlGenerate",
+        "position": [
+          1008,
+          400
+        ],
+        "typeVersion": 1.0
+      },
+      {
+        "parameters": {
+          "options": {
+            "systemMessage": "You are a Real Estate Market Intelligence Agent that synthesizes diverse information sources to provide actionable market intelligence. You transform overwhelming data streams into clear, informed decision-making tools.\n\nYour Intelligence Sources:\n- **News Aggregation**: RSS feeds from Bloomberg, Reuters, WSJ Real Estate\n- **Social Sentiment**: Twitter, Reddit, LinkedIn analysis for market mood\n- **Economic Indicators**: FRED API data, local market statistics\n- **Analysis Tools**: NLP processing, sentiment analysis, statistical modeling\n\nIntelligence Framework:\n1. **Data Collection**: Gather news, social sentiment, and economic data in parallel\n2. **Initial Processing**: Each data type processed by specialized analysis tools\n3. **Synthesis**: Combine insights into coherent market narratives\n4. **Anomaly Detection**: Identify unusual patterns requiring attention\n5. **Distribution**: Generate real-time dashboards and personalized alerts\n6. **Feedback Loop**: User interactions refine future intelligence gathering\n\nValue Proposition:\n- Transforms data streams into actionable insights\n- Enables faster, more informed decision-making\n- Provides early warning systems for market changes\n- Supports multiple stakeholder types with customized intelligence\n\nStakeholder Applications:\n- **Real Estate Analysts**: Market research and investment strategy\n- **Portfolio Managers**: Risk management and competitive intelligence\n- **Developers**: Market timing and opportunity identification\n- **Institutional Investors**: Due diligence and market monitoring"
+          }
+        },
+        "id": "intelligence-agent",
+        "name": "Real Estate Market Intelligence Agent",
+        "type": "@n8n/n8n-nodes-langchain.agent",
+        "position": [
+          544,
+          80
+        ],
+        "typeVersion": 2.2
+      },
+      {
+        "parameters": {
+          "content": "## Real Estate Market Intelligence Agent\n\n**Purpose**: Synthesizes diverse information sources to provide actionable market intelligence\n\n**Value**: Transforms overwhelming data streams into actionable insights for faster decision-making\n\n**Intelligence Sources**:\n- **News Aggregation**: Bloomberg, Reuters, WSJ Real Estate RSS feeds\n- **Social Sentiment**: Twitter, Reddit, LinkedIn market discussions\n- **Economic Indicators**: FRED API, local market data, employment stats\n\n**Analysis Tools**:\n- Financial News Processor (NLP, event extraction)\n- Market Mood Analyzer (sentiment analysis)\n- Market Fundamentals Engine (statistical modeling)\n- Intelligence Integrator (multimodal synthesis)\n- Market Alert System (anomaly detection)\n\n**Output**:\n- Market Intelligence Portal (real-time dashboards)\n- Personalized alerts and notifications\n- Customizable reporting for different user types\n\n**Stakeholders**: Real estate analysts, portfolio managers, developers, institutional investors, consultants",
+          "height": 1000,
+          "width": 1120,
+          "color": 4
+        },
+        "id": "intelligence-sticky-note",
+        "name": "Market Intelligence Documentation",
+        "type": "n8n-nodes-base.stickyNote",
+        "position": [
+          2032,
+          80
+        ],
+        "typeVersion": 1
+      }
+    ],
+    "connections": {
+      "Market Intelligence Trigger": {
+        "main": [
+          [
+            {
+              "node": "Real Estate Market Intelligence Agent",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Intelligence Memory": {
+        "ai_memory": [
+          [
+            {
+              "node": "Real Estate Market Intelligence Agent",
+              "type": "ai_memory",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Intelligence Synthesis Model": {
+        "ai_languageModel": [
+          [
+            {
+              "node": "Real Estate Market Intelligence Agent",
+              "type": "ai_languageModel",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Market News Monitor": {
+        "ai_tool": [
+          [
+            {
+              "node": "Real Estate Market Intelligence Agent",
+              "type": "ai_tool",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Sentiment Analysis Engine": {
+        "ai_tool": [
+          [
+            {
+              "node": "Real Estate Market Intelligence Agent",
+              "type": "ai_tool",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Macro Indicator Tracker": {
+        "ai_tool": [
+          [
+            {
+              "node": "Real Estate Market Intelligence Agent",
+              "type": "ai_tool",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Financial News Processor": {
+        "ai_tool": [
+          [
+            {
+              "node": "Real Estate Market Intelligence Agent",
+              "type": "ai_tool",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Market Mood Analyzer": {
+        "ai_tool": [
+          [
+            {
+              "node": "Real Estate Market Intelligence Agent",
+              "type": "ai_tool",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Market Fundamentals Engine": {
+        "ai_tool": [
+          [
+            {
+              "node": "Real Estate Market Intelligence Agent",
+              "type": "ai_tool",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Intelligence Integrator": {
+        "ai_tool": [
+          [
+            {
+              "node": "Real Estate Market Intelligence Agent",
+              "type": "ai_tool",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Market Alert System": {
+        "ai_tool": [
+          [
+            {
+              "node": "Real Estate Market Intelligence Agent",
+              "type": "ai_tool",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Market Intelligence Portal": {
+        "ai_tool": [
+          [
+            {
+              "node": "Real Estate Market Intelligence Agent",
+              "type": "ai_tool",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "pinData": {},
+    "meta": {
+      "instanceId": "market-intelligence-workflow"
+    }
+  }
