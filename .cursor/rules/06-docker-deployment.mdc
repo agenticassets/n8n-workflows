@@ -1,0 +1,18 @@
+---
+description: Docker containerization and deployment practices for n8n workflow system
+globs: Dockerfile,docker-compose.yml,run.py,*.sh
+alwaysApply: false
+---
+
+- Use multi-stage Docker builds with Python slim images for optimized production images
+- Implement security best practices: non-root user, minimal attack surface, proper file permissions
+- Configure health checks with curl commands to verify API endpoint availability
+- Use volume mounts for persistent data: database and workflow directories
+- Set proper environment variables: PYTHONUNBUFFERED=1, WORKFLOW_DB_PATH for configuration
+- Implement restart policies and proper container resource management
+- Use Docker Compose with named networks and container naming for service discovery
+- Include database initialization and directory creation in Docker setup
+- Support both build-from-source and pre-built image deployment options
+
+@Dockerfile
+@docker-compose.yml

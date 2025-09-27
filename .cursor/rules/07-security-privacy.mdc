@@ -1,0 +1,17 @@
+---
+description: Security and privacy guidelines for workflow system and data protection
+globs: api_server.py,workflow_db.py,workflows/**,context/**
+alwaysApply: false
+---
+
+- Remove all credentials, API keys, and sensitive data from workflow JSON files before storage
+- Implement data sanitization to strip personal information and authentication tokens
+- Use environment variables for database paths and configuration to avoid hardcoded secrets
+- Validate all workflow JSON parsing to prevent malicious code execution or data injection
+- Implement proper error handling that never exposes stack traces or sensitive information
+- Use parameterized database queries to prevent SQL injection vulnerabilities
+- Validate file uploads and JSON parsing with size limits and structure validation
+- Implement access controls and audit logging for sensitive operations
+- Document data retention policies and provide clear privacy notices for workflow usage
+
+@README.md

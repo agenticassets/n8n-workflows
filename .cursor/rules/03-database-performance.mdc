@@ -1,0 +1,17 @@
+---
+description: SQLite database operations and performance optimization patterns
+globs: workflow_db.py,*.py
+alwaysApply: false
+---
+
+- Use WAL mode (PRAGMA journal_mode=WAL) for concurrent read/write performance
+- Configure SQLite pragmas: synchronous=NORMAL, cache_size=10000, temp_store=MEMORY
+- Implement FTS5 virtual tables for sub-100ms full-text search across multiple columns
+- Create database triggers to keep FTS5 tables synchronized with main tables
+- Use MD5 hashing for change detection and efficient re-indexing
+- Implement proper database connection management with context managers
+- Create strategic indexes on frequently filtered columns (trigger_type, complexity, active)
+- Handle database migrations gracefully with IF NOT EXISTS statements
+- Use parameterized queries to prevent SQL injection and optimize performance
+
+@workflow_db.py

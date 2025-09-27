@@ -1,0 +1,18 @@
+---
+description: Workflow categorization, naming conventions, and organization patterns
+globs: create_categories.py,context/**,workflows/**
+alwaysApply: false
+---
+
+- Follow naming convention: [ID]_[Service1]_[Service2]_[Purpose]_[Trigger].json
+- Use intelligent capitalization: HTTP→HTTP, API→API, webhook→Webhook, automation→Automation
+- Implement automatic service detection from filename tokens and node analysis
+- Map integrations to 16 business categories using context/def_categories.json
+- Store category assignments in context/search_categories.json for search filtering
+- Use regex normalization to handle integration name variations and special characters
+- Support partial matching for common service name variations
+- Validate categorization accuracy with manual review and automated testing
+- Maintain unique_categories.json as authoritative category reference
+
+@create_categories.py
+@context/def_categories.json

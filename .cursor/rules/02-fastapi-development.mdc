@@ -1,0 +1,16 @@
+---
+description: FastAPI development patterns for high-performance n8n workflow API
+globs: api_server.py,run.py,*.py
+alwaysApply: false
+---
+
+- Use FastAPI with Pydantic v2 models for all API endpoints with proper type hints
+- Implement GZipMiddleware and CORSMiddleware for production performance and accessibility
+- Create Pydantic response models inheriting from BaseModel with field validators for data integrity
+- Use BackgroundTasks for non-blocking operations like database reindexing
+- Structure endpoints with proper HTTP status codes and descriptive error messages
+- Implement startup events to verify database connectivity and initial data
+- Use environment variables for configuration paths (WORKFLOW_DB_PATH)
+- Add comprehensive OpenAPI documentation with meaningful descriptions and examples
+
+@api_server.py
